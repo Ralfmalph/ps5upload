@@ -71,13 +71,16 @@ jobs:
           command -v pod || brew install cocoapods
       - name: Install frontend dependencies
         working-directory: client
-        run: npm ci
+        run: |
+          npm ci
+          npm install --no-save --package-lock=false @tauri-apps/cli@2.12.1
+          npm run tauri -- --version
       - name: Initialise iOS project
         working-directory: client
-        run: npm exec --yes --package=@tauri-apps/cli@2.12.1 -- tauri ios init --ci
+        run: npm run tauri -- ios init --ci
       - name: Compile unsigned ARM64 IPA
         working-directory: client
-        run: npm exec --yes --package=@tauri-apps/cli@2.12.1 -- tauri ios build --ci --target aarch64 --no-sign
+        run: npm run tauri -- ios build --ci --target aarch64 --no-sign
       - name: Validate and collect IPA
         run: python3 scripts/verify-ios-ipa.py
       - uses: actions/upload-artifact@v4
