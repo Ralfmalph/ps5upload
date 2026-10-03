@@ -102,7 +102,14 @@ pub async fn local_storage_roots() -> Result<Vec<String>, String> {
         }
         Ok(roots)
     }
-    #[cfg(not(target_os = "android"))]
+    #[cfg(target_os = "ios")]
+    {
+        let home = std::env::var("HOME").map_err(|e| e.to_string())?;
+        let documents = std::path::Path::new(&home).join("Documents");
+        std::fs::create_dir_all(&documents).map_err(|e| e.to_string())?;
+        Ok(vec![documents.to_string_lossy().into_owned()])
+    }
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
     {
         let home = std::env::var("HOME")
             .or_else(|_| std::env::var("USERPROFILE"))
