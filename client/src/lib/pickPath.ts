@@ -1,4 +1,6 @@
 // Cross-platform file/folder picker that returns a REAL filesystem path.
+// iOS browses app Documents: copy files there using the Files app first.
+// This avoids treating iOS file:// URLs as Rust filesystem paths.
 //
 // Desktop uses the native dialog (plugin-dialog), which already returns
 // real paths. Android's scoped storage doesn't — its directory picker is
@@ -9,7 +11,7 @@
 
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 
-import { isAndroid } from "./platform";
+import { isAndroid, isIOS } from "./platform";
 import { engineIsOnThisDevice } from "../state/engine";
 import { pickLocalPath, pickLocalPaths } from "../state/localPicker";
 
@@ -29,7 +31,7 @@ export async function pickPath(opts: PickPathOptions): Promise<string | null> {
   // A server, Android, the web build and a remote engine all browse in-app: the web build has
   // no system dialog, and the system dialog would browse the wrong machine (this one, not the
   // engine's) whenever the engine runs elsewhere.
-  if (opts.source || opts.mode === "any" || isAndroid() || !engineIsOnThisDevice()) {
+  if (opts.source || opts.mode === "any" || isAndroid() || isIOS() || !engineIsOnThisDevice()) {
     return pickLocalPath({
       mode: opts.mode,
       title: opts.title,
@@ -57,7 +59,7 @@ export async function pickPath(opts: PickPathOptions): Promise<string | null> {
 export async function pickPaths(
   opts: Omit<PickPathOptions, "mode"> = {},
 ): Promise<string[]> {
-  if (opts.source || isAndroid() || !engineIsOnThisDevice()) {
+  if (opts.source || isAndroid() || isIOS() || !engineIsOnThisDevice()) {
     return pickLocalPaths({ mode: "file", title: opts.title, filters: opts.filters, source: opts.source });
   }
   const sel = await openDialog({
