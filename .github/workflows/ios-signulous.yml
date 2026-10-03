@@ -73,7 +73,8 @@ jobs:
         working-directory: client
         run: |
           npm ci
-          npm install --no-save --package-lock=false @tauri-apps/cli@2.12.1
+          npm install --prefix "$RUNNER_TEMP/tauri-cli" --no-save --no-package-lock @tauri-apps/cli@2.12.1
+          npm pkg set "scripts.tauri=$RUNNER_TEMP/tauri-cli/node_modules/.bin/tauri"
           npm run tauri -- --version
       - name: Initialise iOS project
         working-directory: client
