@@ -1,0 +1,10 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "identifier": "com.ralfmalph.ps5upload.ios",
+  "bundle": {
+    "iOS": {
+      "minimumSystemVersion": "15.0",
+      "infoPlist": "Info.ios.plist"
+    }
+  }
+}
